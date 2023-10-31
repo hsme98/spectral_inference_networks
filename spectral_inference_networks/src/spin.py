@@ -656,7 +656,7 @@ class SpectralNetwork(object):
             if img_out is not None:
               if not os.path.exists(img_out ):
                 os.mkdir(img_out)
-                plt.savefig(os.path.join(img_out, f"train_{t}.png"))
+              plt.savefig(os.path.join(img_out, f"train_{t}.png"))
             plt.show()
             plt.pause(0.01)
 
