@@ -54,6 +54,7 @@ flags.DEFINE_integer(
     'save_params_every', 50000,
     'Save parameters to checkpoint after this many iteration.')
 flags.DEFINE_integer('shards', 50, 'Number of shards to load, for speed.')
+flags.DEFINE_string('img_out', '/atari_out','Output folder to save the images.')
 
 FLAGS = flags.FLAGS
 
@@ -68,6 +69,7 @@ def train(iterations,
           neig,
           shards,
           game,
+          img_out,
           step_lr=False,
           decay=0.01,
           rmsprop_decay=0.1,
@@ -140,7 +142,7 @@ def train(iterations,
             interpolation='none',
             cmap='gray', vmin=0.0, vmax=255.0))
 
-    _, loss_ax = plt.subplots(1, 1)
+    _, loss_ax = None, None # plt.subplots(1, 1)
     return frame_fig, frame_im, loss_ax
 
   def _update_plots(t,
@@ -163,15 +165,6 @@ def train(iterations,
 
     frame_fig.canvas.draw()
     frame_fig.canvas.flush_events()
-
-    loss_ax.cla()
-    loss_ax.plot(eigenvalues_ma[:t])
-
-    if t > 0:
-      ymin = eigenvalues_ma[max(0, t-1000):t].min()
-      ymax = eigenvalues_ma[max(0, t-1000):t].max()
-      ydiff = ymax - ymin
-      loss_ax.set_ylim([ymin-0.1*ydiff, ymax+0.1*ydiff])
 
   plotting_hooks = {
       'create': _create_plots,
@@ -225,7 +218,10 @@ def train(iterations,
       plotting_hooks=plotting_hooks,
       show_plots=show_plots,
       global_step=global_step,
-      data_for_plotting=data)
+      data_for_plotting=data,
+      img_out=img_out
+  )
+
 
 
 def main(argv):
@@ -244,6 +240,7 @@ def main(argv):
       decay=FLAGS.decay,
       rmsprop_decay=FLAGS.rmsprop_decay,
       game=FLAGS.game,
+      img_out=FLAGS.img_out,
       log_image_every=FLAGS.log_image_every,
       save_params_every=FLAGS.save_params_every,
       use_pfor=FLAGS.use_pfor,

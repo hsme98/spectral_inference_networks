@@ -24,7 +24,7 @@ from setuptools import setup
 
 
 REQUIRED_PACKAGES = ['six', 'absl-py', 'numpy', 'matplotlib',
-                     'tensorflow>=1.13.0']
+                     'tensorflow==1.13.1', 'tqdm']
 EXTRA_PACKAGES = {
     'tensorflow with gpu': ['tensorflow-gpu>=1.8.0'],
 }

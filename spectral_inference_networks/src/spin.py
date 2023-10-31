@@ -26,9 +26,9 @@ import matplotlib.pyplot as plt
 from spectral_inference_networks.src import util
 import tensorflow as tf
 from tensorflow.python.ops import parallel_for as pfor  # pylint: disable=g-direct-tensorflow-import
-
+from tqdm import tqdm
 assert util, ('spectral_inference_networks.src.util must be imported.')
-
+import os
 
 def _collapse_first_dim(x):
   new_shape = tf.concat([[-1], tf.shape(x)[2:]], axis=0)
@@ -573,7 +573,9 @@ class SpectralNetwork(object):
       plotting_hooks=None,
       show_plots=False,
       global_step=None,
-      data_for_plotting=None):
+      data_for_plotting=None,
+      img_out = None
+  ):
     """Training loop for SpIN, with hooks for logging and plotting.
 
     Args:
@@ -632,7 +634,7 @@ class SpectralNetwork(object):
     with tf.Session() as sess:
       sess.run(tf.global_variables_initializer())
       print('Initialized variables')
-      for t in range(iterations):
+      for t in tqdm(range(iterations)):
         sess.run(update_global_step)
         loss_, eigenvalues_, _ = sess.run([self.loss, self.eigenvalues, step])
         stats_hooks['update'](t, loss_, eigenvalues_, **stats)
@@ -651,6 +653,10 @@ class SpectralNetwork(object):
             inputs = sess.run(data_for_plotting)
             plotting_hooks['update'](t, outputs, inputs, *plots, **stats)
 
+            if img_out is not None:
+              if not os.path.exists(img_out ):
+                os.mkdir(img_out)
+                plt.savefig(os.path.join(img_out, f"train_{t}.png"))
             plt.show()
             plt.pause(0.01)
 
